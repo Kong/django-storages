@@ -575,22 +575,22 @@ class S3Boto3Storage(BaseStorage):
         name = self._normalize_name(self._clean_name(name))
         if expire is None:
             expire = self.querystring_expire
+        expiration = datetime.utcnow() + timedelta(seconds=expire)
         params = parameters.copy() if parameters else {}
         params['Bucket'] = self.bucket.name
         params['Key'] = name
-        params['ResponseExpires'] = expire
+        params['ResponseExpires'] = expiration
 
         if self.custom_domain:
             url_parts = urlsplit(None)
             url = url_parts._replace(
-                scheme=self.url_protocol,
-                hostname=self.custom_domain,
+                scheme=self.url_protocol.split(':')[0],
+                netloc=self.custom_domain,
                 path=filepath_to_uri(name),
                 query=self._build_s3_getobject_querystring(params),
                 ).geturl()
 
             if self.querystring_auth and self.cloudfront_signer:
-                expiration = datetime.utcnow() + timedelta(seconds=expire)
                 return self.cloudfront_signer.generate_presigned_url(url, date_less_than=expiration)
 
             return url
