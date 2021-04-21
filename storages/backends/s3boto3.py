@@ -572,7 +572,7 @@ class S3Boto3Storage(BaseStorage):
                 self._s3_service_model['operations']['GetObject'], sm)
         serializer = botocore.serialize.create_serializer('rest-json')
         url_dict = serializer.serialize_to_request(params, om)
-        return urlencode(url_dict['query_string'])
+        return urlencode(url_dict['query_string'], safe='/",')
 
     def url(self, name, parameters=None, expire=None, http_method=None):
         # Preserve the trailing slash after normalizing the path.
@@ -583,7 +583,10 @@ class S3Boto3Storage(BaseStorage):
         params = parameters.copy() if parameters else {}
         params['Bucket'] = self.bucket.name
         params['Key'] = name
-        params['ResponseExpires'] = expiration
+        # The "ResponseExpires" value ends up with a comma, which
+        #  often gets un-escaped by some over-zealos URL re-parsers. :/
+        # It also doesn't make sense behind CloudFront
+        # params['ResponseExpires'] = expiration
 
         if self.custom_domain:
             url_parts = urlsplit(None)
