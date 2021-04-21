@@ -1,1 +1,1 @@
-__version__ = '1.11.1+Kong05'
+__version__ = '1.11.1+Kong06'
