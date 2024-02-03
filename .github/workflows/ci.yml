@@ -10,6 +10,7 @@ on:
 
 jobs:
   run_unittest_tests:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     name: Unittest
     runs-on: ${{ matrix.os }}
     strategy:
@@ -51,6 +52,7 @@ jobs:
         run: tox
 
   run_quality_tests:
+    timeout-minutes: ${{ fromJSON(vars.GHA_DEFAULT_TIMEOUT) }}
     name: Quality tests
     runs-on: ${{ matrix.os }}
     strategy:
